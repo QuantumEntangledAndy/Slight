@@ -1,0 +1,4 @@
+(
+    title: "Slight o Hand",
+    dimensions: Some((1024, 768)),
+)
