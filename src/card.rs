@@ -1,15 +1,25 @@
+use crate::cache::SpriteCache;
+use crate::mousetracking::MouseTracking;
+use crate::slight::ARENA_HEIGHT;
+
 use amethyst::{
-    prelude::*,
-    ecs::{Component, DenseVecStorage, Entity},
-    core::transform::{Transform, Parent},
+    assets::Handle,
     core::math::Vector3,
-    renderer::{ImageFormat, SpriteSheet, SpriteSheetFormat, SpriteRender, Texture},
-    renderer::resources::Tint,
+    core::transform::{Parent, Transform},
+    ecs::{Component, DenseVecStorage, Entity},
+    prelude::*,
     renderer::palette::Srgba,
-    assets::{AssetStorage, Loader, Handle},
+    renderer::resources::Tint,
+    renderer::{SpriteRender, SpriteSheet},
 };
 
-use crate::slight::ARENA_HEIGHT;
+#[allow(dead_code)]
+enum Location {
+    Hand,
+    Deck,
+    Pile,
+    Floating(f32, f32),
+}
 
 #[allow(dead_code)]
 pub enum Suit {
@@ -23,23 +33,27 @@ pub struct Card {
     suit: Suit,
     number: usize,
     flipped: bool,
-    bg_sprite: Handle<SpriteSheet>,
-    suit_sprite: Handle<SpriteSheet>,
-    number_sprite: Handle<SpriteSheet>,
+    location: Location,
 }
 
 impl Card {
-    pub fn new_entity(suit: Suit, number: usize, sprite_symbol: &Handle<SpriteSheet>, sprite_card: &Handle<SpriteSheet>, sprite_number: &Handle<SpriteSheet>, mut transform: Transform, world: &mut World) -> Entity {
-        let card = Self {
+    pub fn new(suit: Suit, number: usize) -> Self {
+        Self {
             suit,
             number,
             flipped: true,
-            bg_sprite: sprite_card.clone(),
-            suit_sprite: sprite_symbol.clone(),
-            number_sprite: sprite_number.clone(),
-        };
+            location: Location::Floating(0., 0.),
+        }
+    }
 
-        const TOP_LEFT: (f32, f32) = (-500.+300., 500.-150.);
+    pub fn set_floating(&mut self, x: f32, y: f32) {
+        self.location = Location::Floating(x, y);
+    }
+
+    pub fn build(card: Self, world: &mut World) -> Entity {
+        let mut transform: Transform = Transform::default();
+
+        const TOP_LEFT: (f32, f32) = (-500. + 300., 500. - 150.);
         const CARD_HEIGHT: f32 = 1000.;
 
         const SUIT_WIDTH: f32 = 500.;
@@ -50,26 +64,41 @@ impl Card {
 
         const FONT_WIDTH: f32 = 40.;
         const FONT_HEIGHT: f32 = 79.;
-        const FONT_SCALE: f32 = SUIT_HEIGHT/FONT_HEIGHT;
-        const FONT_SHIFT: f32 = SUIT_WIDTH/2. + FONT_WIDTH * FONT_SCALE;
+        const FONT_SCALE: f32 = SUIT_HEIGHT / FONT_HEIGHT;
+        const FONT_SHIFT: f32 = SUIT_WIDTH / 2. + FONT_WIDTH * FONT_SCALE;
 
-        const CARD_SCALE: f32 = ARENA_HEIGHT/CARD_HEIGHT*0.3;
+        const CARD_SCALE: f32 = ARENA_HEIGHT / CARD_HEIGHT * 0.3;
 
         transform.set_scale(Vector3::new(CARD_SCALE, CARD_SCALE, CARD_SCALE));
 
+        let mut mouse_tracking = MouseTracking::new();
 
-        let suit_sprite = card.suit_sprite();
-        let num_sprite = card.number_sprite();
+        if let Location::Floating(x, y) = card.location {
+            transform.set_translation_xyz(x, y, 0.0);
+            mouse_tracking.activate_xy(x, y);
+        }
+
+        let suit_sprite = card.suit_sprite(world);
+        let num_sprite = card.number_sprite(world);
+        let bg_sprite = card.bg_sprite(world);
         let tint = match card.suit {
-            Suit::Heart | Suit::Diamond => Tint(Srgba::new(SUIT_RED.0, SUIT_RED.1, SUIT_RED.2, SUIT_RED.3)),
-            Suit::Club | Suit::Spade => Tint(Srgba::new(SUIT_BLACK.0, SUIT_BLACK.1, SUIT_BLACK.2, SUIT_BLACK.3)),
+            Suit::Heart | Suit::Diamond => {
+                Tint(Srgba::new(SUIT_RED.0, SUIT_RED.1, SUIT_RED.2, SUIT_RED.3))
+            }
+            Suit::Club | Suit::Spade => Tint(Srgba::new(
+                SUIT_BLACK.0,
+                SUIT_BLACK.1,
+                SUIT_BLACK.2,
+                SUIT_BLACK.3,
+            )),
         };
 
         let entity = world
             .create_entity()
-            .with(card.bg_sprite())
+            .with(bg_sprite)
             .with(card)
             .with(transform)
+            .with(mouse_tracking)
             .build();
 
         // Top left
@@ -123,87 +152,46 @@ impl Card {
         entity
     }
 
-    pub fn load_sprites(world: &mut World) -> (Handle<SpriteSheet>, Handle<SpriteSheet>, Handle<SpriteSheet>) {
-        let loader = world.read_resource::<Loader>();
-        // Suit Sheet
-        let texture_handle = {
-            let texture_storage = world.read_resource::<AssetStorage<Texture>>();
-            loader.load(
-                "suits/suits.png",
-                ImageFormat::default(),
-                (),
-                &texture_storage,
-            )
-        };
-        let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
-        let suits = loader.load(
-            "suits/suits.ron", // Here we load the associated ron file
-            SpriteSheetFormat(texture_handle),
-            (),
-            &sprite_sheet_store,
-        );
-
-        // Card Sheet
-        let texture_handle = {
-            let texture_storage = world.read_resource::<AssetStorage<Texture>>();
-            loader.load(
-                "card/card.png",
-                ImageFormat::default(),
-                (),
-                &texture_storage,
-            )
-        };
-        let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
-        let card = loader.load(
-            "card/card.ron", // Here we load the associated ron file
-            SpriteSheetFormat(texture_handle),
-            (),
-            &sprite_sheet_store,
-        );
-
-        // Number Sheet
-        let texture_handle = {
-            let texture_storage = world.read_resource::<AssetStorage<Texture>>();
-            loader.load(
-                "font/cardtxt.png",
-                ImageFormat::default(),
-                (),
-                &texture_storage,
-            )
-        };
-        let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
-        let numbers = loader.load(
-            "font/cardtxt.ron", // Here we load the associated ron file
-            SpriteSheetFormat(texture_handle),
-            (),
-            &sprite_sheet_store,
-        );
-
-        (suits, card, numbers)
+    fn load_suit_sprite(world: &World) -> Handle<SpriteSheet> {
+        let mut cache = world.fetch_mut::<SpriteCache>();
+        cache.get_or_insert("suits/suits", world)
     }
 
-    fn suit_sprite(&self) -> SpriteRender {
+    fn load_card_sprite(world: &World) -> Handle<SpriteSheet> {
+        let mut cache = world.fetch_mut::<SpriteCache>();
+        cache.get_or_insert("card/card", world)
+    }
+
+    fn load_number_sprite(world: &World) -> Handle<SpriteSheet> {
+        let mut cache = world.fetch_mut::<SpriteCache>();
+        cache.get_or_insert("font/cardtxt", world)
+    }
+
+    fn suit_sprite(&self, world: &World) -> SpriteRender {
+        let suit_sprite = Self::load_suit_sprite(world);
         match self.suit {
-            Suit::Heart => SpriteRender::new(self.suit_sprite.clone(), 0),
-            Suit::Diamond => SpriteRender::new(self.suit_sprite.clone(), 1),
-            Suit::Spade => SpriteRender::new(self.suit_sprite.clone(), 2),
-            Suit::Club => SpriteRender::new(self.suit_sprite.clone(), 3),
+            Suit::Heart => SpriteRender::new(suit_sprite, 0),
+            Suit::Diamond => SpriteRender::new(suit_sprite, 1),
+            Suit::Spade => SpriteRender::new(suit_sprite, 2),
+            Suit::Club => SpriteRender::new(suit_sprite, 3),
         }
     }
 
-    fn bg_sprite(&self) -> SpriteRender {
+    fn bg_sprite(&self, world: &World) -> SpriteRender {
+        let bg_sprite = Self::load_card_sprite(world);
         match self.flipped {
-            true => SpriteRender::new(self.bg_sprite.clone(), 0),
-            false => SpriteRender::new(self.bg_sprite.clone(), 1),
+            true => SpriteRender::new(bg_sprite, 0),
+            false => SpriteRender::new(bg_sprite, 1),
         }
     }
 
-    fn number_sprite(&self) -> SpriteRender {
+    fn number_sprite(&self, world: &World) -> SpriteRender {
         assert!(self.number > 0 && self.number < 14, "Invalid card number");
+        let number_sprite = Self::load_number_sprite(world);
         match self.number {
-            1 => SpriteRender::new(self.number_sprite.clone(), 0),
-            n if n>1 && n < 14 => SpriteRender::new(self.number_sprite.clone(), n),
-            _ => unreachable!()
+            1 => SpriteRender::new(number_sprite, 0),
+            n if n > 1 && n < 14 => SpriteRender::new(number_sprite, n),
+            _ => unreachable!(),
         }
     }
 }
