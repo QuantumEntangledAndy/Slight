@@ -29,6 +29,7 @@ impl MouseTracking {
         }
     }
 
+    #[allow(dead_code)]
     pub fn activate_xy(&mut self, x: f32, y: f32) {
         self.activate(&Vector2::new(x, y));
     }

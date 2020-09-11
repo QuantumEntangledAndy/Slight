@@ -1,5 +1,6 @@
 use crate::cache::SpriteCache;
 use crate::mousetracking::MouseTracking;
+use crate::boundingbox::BoundingBox;
 use crate::slight::ARENA_HEIGHT;
 
 use amethyst::{
@@ -54,6 +55,7 @@ impl Card {
         let mut transform: Transform = Transform::default();
 
         const TOP_LEFT: (f32, f32) = (-500. + 300., 500. - 150.);
+        const CARD_WIDTH: f32 = 500.;
         const CARD_HEIGHT: f32 = 1000.;
 
         const SUIT_WIDTH: f32 = 500.;
@@ -71,11 +73,12 @@ impl Card {
 
         transform.set_scale(Vector3::new(CARD_SCALE, CARD_SCALE, CARD_SCALE));
 
-        let mut mouse_tracking = MouseTracking::new();
+        let mouse_tracking = MouseTracking::new();
+        let boundingbox = BoundingBox::new(CARD_WIDTH, CARD_HEIGHT);
 
         if let Location::Floating(x, y) = card.location {
             transform.set_translation_xyz(x, y, 0.0);
-            mouse_tracking.activate_xy(x, y);
+            //mouse_tracking.activate_xy(x, y);
         }
 
         let suit_sprite = card.suit_sprite(world);
@@ -97,6 +100,7 @@ impl Card {
             .create_entity()
             .with(bg_sprite)
             .with(card)
+            .with(boundingbox)
             .with(transform)
             .with(mouse_tracking)
             .build();
