@@ -1,4 +1,3 @@
-use crate::cache::SpriteCache;
 use crate::card::{Card, Suit};
 use crate::utils::mouse_ray;
 use crate::mousetracking::MouseTracking;
@@ -8,7 +7,6 @@ use amethyst::{
     core::transform::Transform,
     core::math::{Vector2},
     prelude::*,
-    renderer::{ActiveCamera, Camera},
     input::{InputEvent, Button},
     winit::MouseButton,
     ecs::Join,
@@ -22,9 +20,7 @@ pub struct Slight;
 impl SimpleState for Slight {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
-        world.insert(SpriteCache::new());
 
-        initialise_camera(world);
         initialise_card(world);
     }
 
@@ -48,21 +44,6 @@ impl SimpleState for Slight {
 
         Trans::None
     }
-}
-
-fn initialise_camera(world: &mut World) {
-    // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left.
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 1.0);
-
-    let cam_ent = world
-        .create_entity()
-        .with(Camera::standard_2d(ARENA_WIDTH, ARENA_HEIGHT))
-        .with(transform)
-        .build();
-
-    let act_cam: &mut ActiveCamera = world.get_mut().expect("There shoud be an active camera");
-    act_cam.entity = Some(cam_ent);
 }
 
 /// Initialises one card on the left, and one on the right.

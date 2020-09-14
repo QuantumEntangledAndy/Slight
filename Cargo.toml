@@ -11,6 +11,7 @@ amethyst = { version="0.15", features=["no-slow-safety-checks"] }
 log = "0.4"
 modulator = "0.1"
 env_logger = "0.7"
+serde = "1.0"
 
 [features]
 default = ["metal"]

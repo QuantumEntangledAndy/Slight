@@ -1,0 +1,86 @@
+#![enable(implicit_some)]
+
+Prefab(
+    entities: [
+        PrefabEntity(
+            data: SplashScreen(
+                sprite_scene: (
+                    sheet: Sheet(
+                        texture: File("splash/splashy.png", (
+                            "IMAGE", (
+                                sampler_info: (
+                                    min_filter: Nearest,
+                                    mag_filter: Nearest,
+                                    mip_filter: Nearest,
+                                    wrap_mode: (Tile, Tile, Tile),
+                                    lod_bias: (0),
+                                    lod_range: (
+                                        start: ( 0 ),
+                                        end: ( 8000 ),
+                                    ),
+                                    comparison: None,
+                                    border: (0),
+                                    normalized: true,
+                                    anisotropic: Off,
+                                ),
+                            ),
+                        )),
+                        sprites: [
+                            Grid((
+                                texture_width: 6144,
+                                texture_height: 768,
+                                columns: 6,
+                                rows: 1,
+                                cell_size: (1024, 768),
+                            )),
+                            List((
+                                texture_width: 6144,
+                                texture_height: 768,
+                                sprites: [
+                                    (x: 0,   y: 0, width: 1024, height: 768),
+                                    (x: 1024,   y: 0, width: 1024, height: 768),
+                                    (x: 2048,   y: 0, width: 1024, height: 768),
+                                    (x: 3072,   y: 0, width: 1024, height: 768),
+                                    (x: 4072,   y: 0, width: 1024, height: 768),
+                                    (x: 5120,   y: 0, width: 1024, height: 768),
+                                ],
+                            )),
+                        ],
+                        name: "splashy",
+                    ),
+                    render: (
+                            sheet: "splashy",
+                            sprite_number: 0,
+                    ),
+                    //transform: (
+                    //    translation: (0.0, 0.0, -1.0),
+                    //),
+                ),
+                animation_set: (
+                    animations: [
+                        (
+                            Splash,
+                            (
+                                samplers: [
+                                    (
+                                        0,
+                                        // Only SpriteIndex channel allowed for SpriteRender in AnimationSetPrefab
+                                        SpriteIndex,
+                                        (
+                                            // Time of key frames
+                                            input: [0.0, .1, .2, .3, .4, .5],
+                                            // Sprite indexes from SpriteSheet for key frames
+                                            output: [0, 1, 2, 3, 4, 5],
+                                            // Sprites can only ever be animated with Step
+                                            function: Step,
+                                        ),
+                                    ),
+                                ],
+                            )
+                        )
+                    ]
+                )
+            )
+        )
+    ]
+)
