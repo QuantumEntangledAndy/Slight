@@ -3,7 +3,7 @@ mod splashscreen;
 use crate::cache::SpriteCache;
 pub use self::splashscreen::SplashScreen;
 pub use self::splashscreen::AnimationId;
-use crate::slight::Slight;
+use super::mainmenu::MainMenu;
 
 use amethyst::{
     animation::{
@@ -82,7 +82,7 @@ impl SimpleState for Splash {
         } else if let Some(ref assets_counter) = self.assets_counter {
             if assets_counter.is_complete() {
                 debug!("Assets loaded");
-                return  Trans::Switch(Box::new(Slight));
+                return  Trans::Switch(Box::new(MainMenu));
             }
         }
 
