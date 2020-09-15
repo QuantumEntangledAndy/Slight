@@ -15,9 +15,9 @@ use amethyst::{
 pub const ARENA_HEIGHT: f32 = 768.0;
 pub const ARENA_WIDTH: f32 = 1024.0;
 
-pub struct Slight;
+pub struct Dummy;
 
-impl SimpleState for Slight {
+impl SimpleState for Dummy {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
 
@@ -46,13 +46,13 @@ impl SimpleState for Slight {
     }
 }
 
-impl Default for Slight {
+impl Default for Dummy {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl Slight {
+impl Dummy {
 
     pub fn new() -> Self {
         Self{

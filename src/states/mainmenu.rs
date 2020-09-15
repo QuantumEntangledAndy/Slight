@@ -1,6 +1,6 @@
 use crate::{ARENA_WIDTH, ARENA_HEIGHT};
 use crate::cache::{FontCache};
-use crate::states::slight::{Slight};
+use crate::states::dummy::{Dummy};
 
 use amethyst::{
     prelude::*,
@@ -53,7 +53,7 @@ impl SimpleState for MainMenu {
 
         { // Slight Button
             let ui_transform = UiTransform::new(
-                String::from("mmslight"), // id
+                String::from("mmdebug"), // id
                 Anchor::Middle,                // anchor
                 Anchor::Middle,                // pivot
                 0f32,                          // x
@@ -69,7 +69,7 @@ impl SimpleState for MainMenu {
                 let font_handle = cache.get_or_insert("font/square", world);
                 ui_text = UiText::new(
                     font_handle,                   // font
-                    String::from("Slight"),          // text
+                    String::from("Debug"),          // text
                     [0.5, 0.5, 5.0, 1.0],          // color
                     FONT_SIZE,                         // font_size
                     LineMode::Single,              // line mode
@@ -85,7 +85,7 @@ impl SimpleState for MainMenu {
                 .with(ui_image)
                 .with(Interactable)
                 .build();
-            self.my_entities.insert("slight".to_string(), btn);
+            self.my_entities.insert("debug".to_string(), btn);
         }
         { // Quit Button
             let ui_transform = UiTransform::new(
@@ -121,7 +121,7 @@ impl SimpleState for MainMenu {
                 .with(ui_image)
                 .with(Interactable)
                 .with(Parent{
-                    entity: self.my_entities.get("slight").copied().unwrap()
+                    entity: self.my_entities.get("debug").copied().unwrap()
                 })
                 .build();
             self.my_entities.insert("quit".to_string(), btn);
@@ -160,14 +160,14 @@ impl SimpleState for MainMenu {
         if let StateEvent::Ui(ui_event) = event {
             let target = ui_event.target;
             let quit_button_pressed = Some(target) == self.my_entities.get("quit").copied();
-            let slight_button_pressed = Some(target) == self.my_entities.get("slight").copied();
+            let slight_button_pressed = Some(target) == self.my_entities.get("debug").copied();
 
     		match ui_event.event_type {
     			UiEventType::Click if quit_button_pressed => {
                     return Trans::Quit;
     			},
                 UiEventType::Click if slight_button_pressed => {
-                    return Trans::Push(Box::new(Slight::new()));
+                    return Trans::Push(Box::new(Dummy::new()));
     			},
     			_ => {
     				return Trans::None;
