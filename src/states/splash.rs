@@ -1,5 +1,6 @@
 mod splashscreen;
 
+use crate::{ARENA_WIDTH, ARENA_HEIGHT};
 use crate::cache::SpriteCache;
 pub use self::splashscreen::SplashScreen;
 pub use self::splashscreen::AnimationId;
@@ -18,9 +19,6 @@ use amethyst::{
 };
 
 use log::*;
-
-pub const ARENA_HEIGHT: f32 = 768.0;
-pub const ARENA_WIDTH: f32 = 1024.0;
 
 pub struct Splash{
     progress_counter: Option<ProgressCounter>,

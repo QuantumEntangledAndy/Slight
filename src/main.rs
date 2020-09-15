@@ -19,11 +19,14 @@ use amethyst::{
         plugins::{RenderFlat2D, RenderToWindow},
         types::DefaultBackend,
         RenderingBundle,
-        sprite::SpriteRender,
+        sprite::{prefab::SpriteScenePrefab, SpriteRender},
     },
     ui::{RenderUi, UiBundle},
     utils::application_root_dir,
 };
+
+pub const ARENA_HEIGHT: f32 = 768.0;
+pub const ARENA_WIDTH: f32 = 1024.0;
 
 use env_logger::Env;
 use log::info;
@@ -48,6 +51,11 @@ fn main() -> amethyst::Result<()> {
         .with_system_desc(
             PrefabLoaderSystemDesc::<SplashScreen>::default(),
             "scene_loader",
+            &[],
+        )
+        .with_system_desc(
+            PrefabLoaderSystemDesc::<SpriteScenePrefab>::default(),
+            "sprite_loader",
             &[],
         )
         .with_bundle(AnimationBundle::<AnimationId, SpriteRender>::new(

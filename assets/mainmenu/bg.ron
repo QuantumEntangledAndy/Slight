@@ -1,0 +1,56 @@
+#![enable(implicit_some)]
+
+Prefab(
+    entities: [
+        PrefabEntity(
+            data: SpriteScenePrefab(
+                sheet: Sheet(
+                    // <span>Photo by <a href="https://unsplash.com/@jjbart7?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Joshua Bartell</a> on <a href="https://unsplash.com/s/photos/wood?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
+                    texture: File("mainmenu/bg.png", (
+                        "IMAGE", (
+                            sampler_info: (
+                                min_filter: Nearest,
+                                mag_filter: Nearest,
+                                mip_filter: Nearest,
+                                wrap_mode: (Tile, Tile, Tile),
+                                lod_bias: (0),
+                                lod_range: (
+                                    start: ( 0 ),
+                                    end: ( 8000 ),
+                                ),
+                                comparison: None,
+                                border: (0),
+                                normalized: true,
+                                anisotropic: Off,
+                            ),
+                        ),
+                    )),
+                    sprites: [
+                        Grid((
+                            texture_width: 1024,
+                            texture_height: 768,
+                            columns: 1,
+                            rows: 1,
+                            cell_size: (1024, 768),
+                        )),
+                        List((
+                            texture_width: 1024,
+                            texture_height: 768,
+                            sprites: [
+                                (x: 0,   y: 0, width: 1024, height: 768),
+                            ],
+                        )),
+                    ],
+                    name: "mmbg",
+                ),
+                render: (
+                        sheet: "mmbg",
+                        sprite_number: 0,
+                ),
+                //transform: (
+                //    translation: (0.0, 0.0, -1.0),
+                //),
+            ),
+        )
+    ]
+)
