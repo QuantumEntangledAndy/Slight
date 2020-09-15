@@ -21,7 +21,7 @@ impl SimpleState for Slight {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
 
-        initialise_card(world);
+        Self::initialise_card(world);
     }
 
     fn handle_event(&mut self, data:StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
@@ -46,16 +46,31 @@ impl SimpleState for Slight {
     }
 }
 
-/// Initialises one card on the left, and one on the right.
-fn initialise_card(world: &mut World) {
-    world.register::<Card>();
-    world.register::<BoundingBox>();
+impl Default for Slight {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-    let mut card1 = Card::new(Suit::Heart, 1);
-    card1.set_floating(100., ARENA_HEIGHT / 2.);
-    Card::build(card1, world);
+impl Slight {
 
-    let mut card2 = Card::new(Suit::Spade, 2);
-    card2.set_floating(ARENA_WIDTH - 100., ARENA_HEIGHT / 2.);
-    Card::build(card2, world);
+    pub fn new() -> Self {
+        Self{
+
+        }
+    }
+
+    /// Initialises one card on the left, and one on the right.
+    fn initialise_card(world: &mut World) {
+        world.register::<Card>();
+        world.register::<BoundingBox>();
+
+        let mut card1 = Card::new(Suit::Heart, 1);
+        card1.set_floating(100., ARENA_HEIGHT / 2.);
+        Card::build(card1, world);
+
+        let mut card2 = Card::new(Suit::Spade, 2);
+        card2.set_floating(ARENA_WIDTH - 100., ARENA_HEIGHT / 2.);
+        Card::build(card2, world);
+    }
 }

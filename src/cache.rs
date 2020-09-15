@@ -1,7 +1,8 @@
 use amethyst::{
-    assets::{AssetStorage, Handle, Loader},
+    assets::{AssetStorage, Handle, Loader, ProgressCounter},
     prelude::*,
     renderer::{ImageFormat, SpriteSheet, SpriteSheetFormat, Texture},
+    ui::{FontAsset, TtfFormat},
 };
 use std::collections::HashMap;
 
@@ -38,6 +39,53 @@ impl SpriteCache {
             );
             self.map.insert(key.to_string(), sheet.clone());
             sheet
+        }
+    }
+}
+
+pub struct FontCache {
+    map: HashMap<String, Handle<FontAsset>>,
+}
+
+impl FontCache {
+    pub fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+        }
+    }
+    pub fn get_or_insert(&mut self, key: &str, world: &World) -> Handle<FontAsset> {
+        if let Some(value) = self.map.get(key) {
+            value.clone()
+        } else {
+            let font_handle = {
+                let font_storage = world.read_resource::<AssetStorage<FontAsset>>();
+                world.read_resource::<Loader>().load(
+                    format!("{}.ttf", key),
+                    TtfFormat,
+                    (),
+                    &font_storage,
+                )
+            };
+            self.map.insert(key.to_string(), font_handle.clone());
+            font_handle
+        }
+    }
+
+    pub fn get_or_insert_progress(&mut self, key: &str, world: &World, progress: &mut ProgressCounter) -> Handle<FontAsset> {
+        if let Some(value) = self.map.get(key) {
+            value.clone()
+        } else {
+            let font_handle = {
+                let font_storage = world.read_resource::<AssetStorage<FontAsset>>();
+                world.read_resource::<Loader>().load(
+                    format!("{}.ttf", key),
+                    TtfFormat,
+                    progress,
+                    &font_storage,
+                )
+            };
+            self.map.insert(key.to_string(), font_handle.clone());
+            font_handle
         }
     }
 }

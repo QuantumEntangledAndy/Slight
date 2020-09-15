@@ -1,7 +1,7 @@
 use crate::cache::SpriteCache;
 use crate::mousetracking::MouseTracking;
 use crate::boundingbox::BoundingBox;
-use crate::slight::ARENA_HEIGHT;
+use crate::ARENA_HEIGHT;
 
 use amethyst::{
     assets::Handle,

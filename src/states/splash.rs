@@ -1,7 +1,7 @@
 mod splashscreen;
 
 use crate::{ARENA_WIDTH, ARENA_HEIGHT};
-use crate::cache::SpriteCache;
+use crate::cache::{SpriteCache, FontCache};
 pub use self::splashscreen::SplashScreen;
 pub use self::splashscreen::AnimationId;
 use super::mainmenu::MainMenu;
@@ -31,6 +31,7 @@ impl SimpleState for Splash {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         world.insert(SpriteCache::new());
+        world.insert(FontCache::new());
 
         Self::initialise_camera(world);
         self.splashy(world);
@@ -80,7 +81,7 @@ impl SimpleState for Splash {
         } else if let Some(ref assets_counter) = self.assets_counter {
             if assets_counter.is_complete() {
                 debug!("Assets loaded");
-                return  Trans::Switch(Box::new(MainMenu::new()));
+                return  Trans::Replace(Box::new(MainMenu::new()));
             }
         }
 
@@ -147,8 +148,10 @@ impl Splash {
         }
     }
 
-    fn load_assets(&mut self, _world: &mut World) {
+    fn load_assets(&mut self, world: &mut World) {
         // This should load assets and add them to the assets_counter
         self.assets_counter = Some(Default::default());
+        let mut cache = world.fetch_mut::<FontCache>();
+        cache.get_or_insert_progress("font/square", world, self.assets_counter.as_mut().unwrap());
     }
 }
