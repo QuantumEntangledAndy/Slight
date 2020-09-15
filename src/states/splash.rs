@@ -82,7 +82,7 @@ impl SimpleState for Splash {
         } else if let Some(ref assets_counter) = self.assets_counter {
             if assets_counter.is_complete() {
                 debug!("Assets loaded");
-                return  Trans::Switch(Box::new(MainMenu));
+                return  Trans::Switch(Box::new(MainMenu::new()));
             }
         }
 

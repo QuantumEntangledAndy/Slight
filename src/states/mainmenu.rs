@@ -4,7 +4,8 @@ use amethyst::{
 
 use log::*;
 
-pub struct MainMenu;
+pub struct MainMenu {
+}
 
 impl SimpleState for MainMenu {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
