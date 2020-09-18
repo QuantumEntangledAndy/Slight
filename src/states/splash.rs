@@ -7,15 +7,11 @@ pub use self::splashscreen::AnimationId;
 use super::mainmenu::MainMenu;
 
 use amethyst::{
-    animation::{
-        get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet,
-        EndControl,
-    },
-    ecs::{Entity, Entities, Join, ReadStorage, WriteStorage},
     core::transform::Transform,
     prelude::*,
-    renderer::{ActiveCamera, Camera, sprite::SpriteRender,},
-    assets::{ProgressCounter, PrefabLoader, RonFormat},
+    ecs::Entity,
+    renderer::{ActiveCamera, Camera},
+    assets::{ProgressCounter, Prefab, PrefabLoader, RonFormat, Handle},
 };
 
 use log::*;
@@ -32,6 +28,16 @@ impl SimpleState for Splash {
         let world = data.world;
         world.insert(SpriteCache::new());
         world.insert(FontCache::new());
+
+        self.progress_counter = Some(Default::default());
+        let splash_prefab = world.exec(|loader: PrefabLoader<'_, SplashScreen>| {
+            loader.load(
+                "splash/splashscreen.ron",
+                RonFormat,
+                self.progress_counter.as_mut().unwrap(),
+            )
+        });
+        world.insert(splash_prefab);
 
         Self::initialise_camera(world);
         self.splashy(world);
@@ -51,27 +57,8 @@ impl SimpleState for Splash {
                 if progress_counter.is_complete() {
                     debug!("Loaded sprite");
                     let StateData { world, .. } = data;
-                    world.exec(
-                        |(entities, animation_sets, mut control_sets): (
-                            Entities,
-                            ReadStorage<AnimationSet<AnimationId, SpriteRender>>,
-                            WriteStorage<AnimationControlSet<AnimationId, SpriteRender>>,
-                        )| {
-                            // For each entity that has AnimationSet
-                            for (entity, animation_set) in (&entities, &animation_sets).join() {
-                                // Creates a new AnimationControlSet for the entity
-                                let control_set = get_animation_set(&mut control_sets, entity).unwrap();
-                                // Adds the `Fly` animation to AnimationControlSet and loops infinitely
-                                control_set.add_animation(
-                                    AnimationId::Splash,
-                                    &animation_set.get(&AnimationId::Splash).unwrap(),
-                                    EndControl::Loop(None),
-                                    1.0,
-                                    AnimationCommand::Start,
-                                );
-                            }
-                        },
-                    );
+                    let loading_ent = self.splash_ent;
+                    SplashScreen::start_anim(world, loading_ent.unwrap());
                     // All data loaded
                     self.progress_counter = None;
                     debug!("Loaded anims");
@@ -108,7 +95,7 @@ impl Splash {
     fn initialise_camera(world: &mut World) {
         // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left.
         let mut transform = Transform::default();
-        transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 1.0);
+        transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 100.0);
 
         let cam_ent = world
             .create_entity()
@@ -122,17 +109,9 @@ impl Splash {
 
     fn splashy(&mut self, world: &mut World) {
         // Start loading animated splashy
-        self.progress_counter = Some(Default::default());
-        let splash_prefab = world.exec(|loader: PrefabLoader<'_, SplashScreen>| {
-            loader.load(
-                "splash/splashscreen.ron",
-                RonFormat,
-                self.progress_counter.as_mut().unwrap(),
-            )
-        });
-
+        let splash_prefab = (*world.read_resource::<Handle<Prefab<SplashScreen>>>()).clone();
         let mut transform = Transform::default();
-        transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 0.0);
+        transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 99.0);
 
         self.splash_ent = Some(world.create_entity()
         .with(splash_prefab)

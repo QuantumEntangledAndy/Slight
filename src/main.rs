@@ -1,7 +1,5 @@
-mod boundingbox;
+mod components;
 mod cache;
-mod card;
-mod mousetracking;
 mod systems;
 mod utils;
 mod states;

@@ -1,6 +1,6 @@
 use crate::{ARENA_WIDTH, ARENA_HEIGHT};
 use crate::cache::{FontCache};
-use crate::states::dummy::{Dummy};
+use crate::states::dummy::{DummyLoad};
 
 use amethyst::{
     prelude::*,
@@ -167,7 +167,7 @@ impl SimpleState for MainMenu {
                     return Trans::Quit;
     			},
                 UiEventType::Click if slight_button_pressed => {
-                    return Trans::Push(Box::new(Dummy::new()));
+                    return Trans::Push(Box::new(DummyLoad::new()));
     			},
     			_ => {
     				return Trans::None;

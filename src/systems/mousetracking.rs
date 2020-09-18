@@ -1,4 +1,4 @@
-use crate::mousetracking::MouseTracking;
+use crate::components::mousetracking::MouseTracking;
 
 use amethyst::core::math::{Point3, Vector2, Vector3, Vector4};
 use amethyst::core::{Time, Transform};

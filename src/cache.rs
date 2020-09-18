@@ -16,7 +16,12 @@ impl SpriteCache {
             map: HashMap::new(),
         }
     }
+    #[allow(dead_code)]
     pub fn get_or_insert(&mut self, key: &str, world: &World) -> Handle<SpriteSheet> {
+        self.get_or_insert_progress(key, world, &mut Default::default())
+    }
+
+    pub fn get_or_insert_progress(&mut self, key: &str, world: &World, progress: &mut ProgressCounter) -> Handle<SpriteSheet> {
         if let Some(value) = self.map.get(key) {
             value.clone()
         } else {
@@ -26,7 +31,7 @@ impl SpriteCache {
                 world.read_resource::<Loader>().load(
                     format!("{}.png", key),
                     ImageFormat::default(),
-                    (),
+                    progress,
                     &texture_storage,
                 )
             };
@@ -54,21 +59,7 @@ impl FontCache {
         }
     }
     pub fn get_or_insert(&mut self, key: &str, world: &World) -> Handle<FontAsset> {
-        if let Some(value) = self.map.get(key) {
-            value.clone()
-        } else {
-            let font_handle = {
-                let font_storage = world.read_resource::<AssetStorage<FontAsset>>();
-                world.read_resource::<Loader>().load(
-                    format!("{}.ttf", key),
-                    TtfFormat,
-                    (),
-                    &font_storage,
-                )
-            };
-            self.map.insert(key.to_string(), font_handle.clone());
-            font_handle
-        }
+        self.get_or_insert_progress(key, world, &mut Default::default())
     }
 
     pub fn get_or_insert_progress(&mut self, key: &str, world: &World, progress: &mut ProgressCounter) -> Handle<FontAsset> {

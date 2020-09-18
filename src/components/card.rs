@@ -1,10 +1,10 @@
 use crate::cache::SpriteCache;
-use crate::mousetracking::MouseTracking;
-use crate::boundingbox::BoundingBox;
+use super::mousetracking::MouseTracking;
+use super::boundingbox::BoundingBox;
 use crate::ARENA_HEIGHT;
 
 use amethyst::{
-    assets::Handle,
+    assets::{Handle, ProgressCounter},
     core::math::Vector3,
     core::transform::{Parent, Transform},
     ecs::{Component, DenseVecStorage, Entity},
@@ -51,7 +51,7 @@ impl Card {
         self.location = Location::Floating(x, y);
     }
 
-    pub fn build(card: Self, world: &mut World) -> Entity {
+    pub fn build(card: Self, world: &mut World, progress: &mut ProgressCounter) -> Entity {
         let mut transform: Transform = Transform::default();
 
         const TOP_LEFT: (f32, f32) = (-500. + 300., 500. - 150.);
@@ -81,9 +81,9 @@ impl Card {
             //mouse_tracking.activate_xy(x, y);
         }
 
-        let suit_sprite = card.suit_sprite(world);
-        let num_sprite = card.number_sprite(world);
-        let bg_sprite = card.bg_sprite(world);
+        let suit_sprite = card.suit_sprite(world, progress);
+        let num_sprite = card.number_sprite(world, progress);
+        let bg_sprite = card.bg_sprite(world, progress);
         let tint = match card.suit {
             Suit::Heart | Suit::Diamond => {
                 Tint(Srgba::new(SUIT_RED.0, SUIT_RED.1, SUIT_RED.2, SUIT_RED.3))
@@ -156,23 +156,23 @@ impl Card {
         entity
     }
 
-    fn load_suit_sprite(world: &World) -> Handle<SpriteSheet> {
+    fn load_suit_sprite(world: &World, progress: &mut ProgressCounter) -> Handle<SpriteSheet> {
         let mut cache = world.fetch_mut::<SpriteCache>();
-        cache.get_or_insert("suits/suits", world)
+        cache.get_or_insert_progress("suits/suits", world, progress)
     }
 
-    fn load_card_sprite(world: &World) -> Handle<SpriteSheet> {
+    fn load_card_sprite(world: &World, progress: &mut ProgressCounter) -> Handle<SpriteSheet> {
         let mut cache = world.fetch_mut::<SpriteCache>();
-        cache.get_or_insert("card/card", world)
+        cache.get_or_insert_progress("card/card", world, progress)
     }
 
-    fn load_number_sprite(world: &World) -> Handle<SpriteSheet> {
+    fn load_number_sprite(world: &World, progress: &mut ProgressCounter) -> Handle<SpriteSheet> {
         let mut cache = world.fetch_mut::<SpriteCache>();
-        cache.get_or_insert("font/cardtxt", world)
+        cache.get_or_insert_progress("font/cardtxt", world, progress)
     }
 
-    fn suit_sprite(&self, world: &World) -> SpriteRender {
-        let suit_sprite = Self::load_suit_sprite(world);
+    fn suit_sprite(&self, world: &World, progress: &mut ProgressCounter) -> SpriteRender {
+        let suit_sprite = Self::load_suit_sprite(world, progress);
         match self.suit {
             Suit::Heart => SpriteRender::new(suit_sprite, 0),
             Suit::Diamond => SpriteRender::new(suit_sprite, 1),
@@ -181,17 +181,17 @@ impl Card {
         }
     }
 
-    fn bg_sprite(&self, world: &World) -> SpriteRender {
-        let bg_sprite = Self::load_card_sprite(world);
+    fn bg_sprite(&self, world: &World, progress: &mut ProgressCounter) -> SpriteRender {
+        let bg_sprite = Self::load_card_sprite(world, progress);
         match self.flipped {
             true => SpriteRender::new(bg_sprite, 0),
             false => SpriteRender::new(bg_sprite, 1),
         }
     }
 
-    fn number_sprite(&self, world: &World) -> SpriteRender {
+    fn number_sprite(&self, world: &World, progress: &mut ProgressCounter) -> SpriteRender {
         assert!(self.number > 0 && self.number < 14, "Invalid card number");
-        let number_sprite = Self::load_number_sprite(world);
+        let number_sprite = Self::load_number_sprite(world, progress);
         match self.number {
             1 => SpriteRender::new(number_sprite, 0),
             n if n > 1 && n < 14 => SpriteRender::new(number_sprite, n),
