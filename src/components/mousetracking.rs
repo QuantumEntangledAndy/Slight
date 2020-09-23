@@ -82,9 +82,6 @@ impl MouseTracking {
             let result = Vector2::new(self.modulator_x.value(), self.modulator_y.value());
 
             let delta = (result - target_pos).magnitude();
-            if delta < EPSILON {
-                self.deactivate();
-            }
 
             Some(result)
         } else {
