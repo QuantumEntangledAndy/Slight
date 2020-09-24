@@ -7,11 +7,12 @@ mod states;
 use crate::states::load;
 use crate::states::load::{Load, LoadScreen};
 use crate::components::droppoint;
+use crate::utils::TransformAnimations;
 
 use amethyst::{
     assets::{PrefabLoaderSystemDesc},
     animation::{AnimationBundle},
-    core::transform::TransformBundle,
+    core::transform::{TransformBundle, Transform},
     input::{InputBundle, StringBindings},
     prelude::*,
     renderer::{
@@ -62,6 +63,10 @@ fn main() -> amethyst::Result<()> {
             "sprite_loader",
             &[],
         )
+        .with_bundle(AnimationBundle::<TransformAnimations, Transform>::new(
+            "animation_control_system",
+            "sampler_interpolation_system",
+        ))?
         .with_bundle(AnimationBundle::<load::AnimationId, SpriteRender>::new(
             "load_animation_control",
             "load_sampler_interpolation",
@@ -85,7 +90,7 @@ fn main() -> amethyst::Result<()> {
         // With transform systems for position tracking
         .with_bundle(
             TransformBundle::new()
-                .with_dep(&["load_animation_control", "load_sampler_interpolation", "dropoint_animation_control", "dropoint_sampler_interpolation"]),
+                .with_dep(&["load_animation_control", "load_sampler_interpolation", "dropoint_animation_control", "dropoint_sampler_interpolation", "sampler_interpolation_system"]),
         )?
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?

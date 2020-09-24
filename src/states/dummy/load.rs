@@ -101,7 +101,7 @@ impl DummyLoad {
         .with(load_prefab)
         .with(transform)
         .build();
-        LoadScreen::start_anim(world, ent);
+        LoadScreen::start_anim_soon(world, ent);
 
         self.my_assets.insert("load_screen".to_string(), ent);
     }

@@ -64,7 +64,7 @@ impl SimpleState for Load {
                     debug!("Loaded sprite");
                     let StateData { world, .. } = data;
                     let loading_ent = self.load_ent;
-                    LoadScreen::start_anim(world, loading_ent.unwrap());
+                    LoadScreen::start_anim_soon(world, loading_ent.unwrap());
                     // All data loaded
                     self.progress_counter = None;
                     debug!("Loaded anims");

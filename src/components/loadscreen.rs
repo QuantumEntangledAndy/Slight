@@ -32,6 +32,11 @@ pub struct LoadScreen {
 }
 
 impl LoadScreen {
+    pub fn start_anim_soon(world: &World, ent: Entity) {
+        let handle = world.read_resource::<CallbackQueue>().send_handle();
+        handle.send(Box::new(move |world| Self::start_anim(world, ent))).expect("Failed to add Callback to CallbackQueue.");
+    }
+
     pub fn start_anim(world: &mut World, ent: Entity) {
         let animation_sets = world.read_component::<AnimationSet<AnimationId, SpriteRender>>();
         let mut control_sets = world.write_component::<AnimationControlSet<AnimationId, SpriteRender>>();

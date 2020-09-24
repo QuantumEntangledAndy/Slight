@@ -1,4 +1,4 @@
-use super::drop::DummyDrop;
+use super::hold::DummyHold;
 
 use crate::utils::mouse_ray;
 use crate::components::clickable::{Clickable, ClickAction};
@@ -48,7 +48,7 @@ impl SimpleState for Dummy {
                         match cl.click() {
                             ClickAction::None => {},
                             ClickAction::DragTo(droppoints) => {
-                                return Trans::Push(Box::new(DummyDrop::new(
+                                return Trans::Push(Box::new(DummyHold::new(
                                     *entity,
                                     droppoints.to_vec(),
                                 )))

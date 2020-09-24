@@ -1,5 +1,5 @@
 use amethyst::{
-    assets::{AssetStorage, Handle, Loader, ProgressCounter, PrefabLoader, RonFormat, Prefab},
+    assets::{AssetStorage, Handle, Loader, ProgressCounter, Prefab},
     prelude::*,
     renderer::{ImageFormat, SpriteSheet, SpriteSheetFormat, Texture},
     ui::{FontAsset, TtfFormat},

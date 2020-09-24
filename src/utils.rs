@@ -1,10 +1,14 @@
 use amethyst::prelude::*;
-use amethyst::core::math::{Point2};
+use amethyst::core::math::{Point2, Vector3};
 use amethyst::core::{Transform, geometry::Ray};
-use amethyst::ecs::{ReadStorage};
+use amethyst::ecs::{ReadStorage, Entity};
 use amethyst::input::{InputHandler, StringBindings};
 use amethyst::renderer::{ActiveCamera, Camera};
 use amethyst::window::ScreenDimensions;
+use amethyst::assets::{Loader, Handle};
+use amethyst::animation::*;
+
+use serde::{Deserialize, Serialize};
 
 pub fn mouse_ray(world: &World) -> Option<Ray<f32>> {
     mouse_ray_resource(
@@ -33,4 +37,50 @@ pub fn mouse_ray_resource<'s>(
         }
     }
     None
+}
+
+#[derive(Eq, PartialOrd, PartialEq, Hash, Debug, Copy, Clone, Deserialize, Serialize)]
+pub enum TransformAnimations {
+    Scale,
+    Rotate,
+    Translate,
+}
+
+pub fn translate_to(world: &World, entity: Entity, from: &Vector3<f32>, to: &Vector3<f32>, time: f32) -> Handle<Animation<Transform>> {
+    let animation = {
+            let loader = world.read_resource::<Loader>();
+
+            let sampler = loader.load_from_data(
+                Sampler {
+                    input: vec![0., 1.],
+                    output: vec![
+                        SamplerPrimitive::Vec3([from[0], from[1], from[2]]),
+                        SamplerPrimitive::Vec3([to[0], to[1], to[2]]),
+                    ],
+                    function: InterpolationFunction::Linear,
+                },
+                (),
+                &world.read_resource(),
+            );
+
+            let animation = loader.load_from_data(
+                Animation::new_single(0, TransformChannel::Translation, sampler),
+                (),
+                &world.read_resource(),
+            );
+            animation
+        };
+
+        let mut control_sets = world.write_component::<AnimationControlSet<TransformAnimations, Transform>>();
+        let control_set = get_animation_set(&mut control_sets, entity).unwrap();
+        // Adds the `Fly` animation to AnimationControlSet and loops infinitely
+        control_set.add_animation(
+            TransformAnimations::Translate,
+            &animation,
+            EndControl::Stay,
+            1./time,
+            AnimationCommand::Start,
+        );
+
+        animation
 }

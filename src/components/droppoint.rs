@@ -53,6 +53,10 @@ impl DropPoint {
     pub fn drop(&self) -> DropAction {
         self.drop_action
     }
+
+    pub fn drop_to(&mut self, ent: Entity) {
+        self.drop_action = DropAction::GiveTo(ent);
+    }
 }
 
 impl Default for DropPoint {
@@ -75,6 +79,11 @@ pub struct DropPointFx {
 }
 
 impl DropPointFx {
+    pub fn start_anim_soon(world: &World, ent: Entity) {
+        let handle = world.read_resource::<CallbackQueue>().send_handle();
+        handle.send(Box::new(move |world| Self::start_anim_world(world, ent))).expect("Failed to add Callback to CallbackQueue.");
+    }
+
     pub fn start_anim_world(world: &World, ent: Entity) {
         let animation_sets = world.read_component::<AnimationSet<AnimationId, SpriteRender>>();
         let control_sets = world.write_component::<AnimationControlSet<AnimationId, SpriteRender>>();
