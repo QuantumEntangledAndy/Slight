@@ -81,8 +81,6 @@ impl MouseTracking {
             self.modulator_y.advance((delta_t * 1e6) as u64);
             let result = Vector2::new(self.modulator_x.value(), self.modulator_y.value());
 
-            let delta = (result - target_pos).magnitude();
-
             Some(result)
         } else {
             None

@@ -4,7 +4,7 @@ This holds some general plans
 ---
 
 
-# Splash State
+# Load State
 
 [x] Load -> MenuState
 

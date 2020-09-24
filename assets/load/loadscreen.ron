@@ -3,10 +3,10 @@
 Prefab(
     entities: [
         PrefabEntity(
-            data: SplashScreen(
+            data: LoadScreen(
                 sprite_scene: (
                     sheet: Sheet(
-                        texture: File("splash/splashy.png", (
+                        texture: File("load/loady.png", (
                             "IMAGE", (
                                 sampler_info: (
                                     min_filter: Nearest,
@@ -46,10 +46,10 @@ Prefab(
                                 ],
                             )),
                         ],
-                        name: "splashy",
+                        name: "loady",
                     ),
                     render: (
-                            sheet: "splashy",
+                            sheet: "loady",
                             sprite_number: 0,
                     ),
                     //transform: (
@@ -59,7 +59,7 @@ Prefab(
                 animation_set: (
                     animations: [
                         (
-                            Splash,
+                            Load,
                             (
                                 samplers: [
                                     (

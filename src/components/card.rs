@@ -2,6 +2,7 @@ use crate::cache::SpriteCache;
 use super::mousetracking::MouseTracking;
 use super::boundingbox::BoundingBox;
 use crate::ARENA_HEIGHT;
+use super::clickable::Clickable;
 
 use amethyst::{
     assets::{Handle, ProgressCounter},
@@ -74,6 +75,7 @@ impl Card {
         transform.set_scale(Vector3::new(CARD_SCALE, CARD_SCALE, CARD_SCALE));
 
         let mouse_tracking = MouseTracking::new();
+        let clickable = Clickable::new();
         let boundingbox = BoundingBox::new(CARD_WIDTH, CARD_HEIGHT);
 
         if let Location::Floating(x, y) = card.location {
@@ -103,6 +105,7 @@ impl Card {
             .with(boundingbox)
             .with(transform)
             .with(mouse_tracking)
+            .with(clickable)
             .build();
 
         // Top left

@@ -4,7 +4,9 @@ mod systems;
 mod utils;
 mod states;
 
-use crate::states::splash::{Splash, SplashScreen, AnimationId};
+use crate::states::load;
+use crate::states::load::{Load, LoadScreen};
+use crate::components::droppoint;
 
 use amethyst::{
     assets::{PrefabLoaderSystemDesc},
@@ -46,8 +48,13 @@ fn main() -> amethyst::Result<()> {
 
     let game_data = GameDataBuilder::default()
         .with_system_desc(
-            PrefabLoaderSystemDesc::<SplashScreen>::default(),
-            "scene_loader",
+            PrefabLoaderSystemDesc::<LoadScreen>::default(),
+            "load_loader",
+            &[],
+        )
+        .with_system_desc(
+            PrefabLoaderSystemDesc::<droppoint::DropPointFx>::default(),
+            "droppoint_loader",
             &[],
         )
         .with_system_desc(
@@ -55,9 +62,13 @@ fn main() -> amethyst::Result<()> {
             "sprite_loader",
             &[],
         )
-        .with_bundle(AnimationBundle::<AnimationId, SpriteRender>::new(
-            "sprite_animation_control",
-            "sprite_sampler_interpolation",
+        .with_bundle(AnimationBundle::<load::AnimationId, SpriteRender>::new(
+            "load_animation_control",
+            "load_sampler_interpolation",
+        ))?
+        .with_bundle(AnimationBundle::<droppoint::AnimationId, SpriteRender>::new(
+            "dropoint_animation_control",
+            "dropoint_sampler_interpolation",
         ))?
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
@@ -74,7 +85,7 @@ fn main() -> amethyst::Result<()> {
         // With transform systems for position tracking
         .with_bundle(
             TransformBundle::new()
-                .with_dep(&["sprite_animation_control", "sprite_sampler_interpolation"]),
+                .with_dep(&["load_animation_control", "load_sampler_interpolation", "dropoint_animation_control", "dropoint_sampler_interpolation"]),
         )?
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?
@@ -84,7 +95,7 @@ fn main() -> amethyst::Result<()> {
             &["input_system"],
         );
 
-    let mut game = Application::new(assets_dir, Splash::new(), game_data)?;
+    let mut game = Application::new(assets_dir, Load::new(), game_data)?;
 
     game.run();
     Ok(())

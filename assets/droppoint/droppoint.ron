@@ -1,0 +1,84 @@
+#![enable(implicit_some)]
+
+Prefab(
+    entities: [
+        PrefabEntity(
+            data: DropPointFx(
+                sprite_scene: (
+                    sheet: Sheet(
+                        texture: File("droppoint/droppoint.png", (
+                            "IMAGE", (
+                                sampler_info: (
+                                    min_filter: Nearest,
+                                    mag_filter: Nearest,
+                                    mip_filter: Nearest,
+                                    wrap_mode: (Tile, Tile, Tile),
+                                    lod_bias: (0),
+                                    lod_range: (
+                                        start: ( 0 ),
+                                        end: ( 8000 ),
+                                    ),
+                                    comparison: None,
+                                    border: (0),
+                                    normalized: true,
+                                    anisotropic: Off,
+                                ),
+                            ),
+                        )),
+                        sprites: [
+                            Grid((
+                                texture_width: 400,
+                                texture_height: 100,
+                                columns: 3,
+                                rows: 1,
+                                cell_size: (100, 100),
+                            )),
+                            List((
+                                texture_width: 400,
+                                texture_height: 100,
+                                sprites: [
+                                    (x: 0,   y: 0, width: 100, height: 100),
+                                    (x: 100,   y: 0, width: 100, height: 100),
+                                    (x: 200,   y: 0, width: 100, height: 100),
+                                    (x: 300,   y: 0, width: 100, height: 100),
+                                ],
+                            )),
+                        ],
+                        name: "droppoint",
+                    ),
+                    render: (
+                            sheet: "droppoint",
+                            sprite_number: 0,
+                    ),
+                    //transform: (
+                    //    translation: (0.0, 0.0, -1.0),
+                    //),
+                ),
+                animation_set: (
+                    animations: [
+                        (
+                            DropPointFx,
+                            (
+                                samplers: [
+                                    (
+                                        0,
+                                        // Only SpriteIndex channel allowed for SpriteRender in AnimationSetPrefab
+                                        SpriteIndex,
+                                        (
+                                            // Time of key frames
+                                            input: [0.0, .1, .2, .3],
+                                            // Sprite indexes from SpriteSheet for key frames
+                                            output: [0, 1, 2, 3],
+                                            // Sprites can only ever be animated with Step
+                                            function: Step,
+                                        ),
+                                    ),
+                                ],
+                            )
+                        )
+                    ]
+                )
+            )
+        )
+    ]
+)

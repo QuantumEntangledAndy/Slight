@@ -1,15 +1,12 @@
 use crate::{ARENA_WIDTH, ARENA_HEIGHT};
-use crate::cache::{FontCache};
+use crate::cache::{FontCache, SpriteScenePrefabCache};
 use crate::states::dummy::{DummyLoad};
 
 use amethyst::{
     prelude::*,
     core::{Transform, Parent, Hidden},
     ecs::{Entity},
-    assets::{PrefabLoader, RonFormat, ProgressCounter},
-    renderer::{
-        sprite::{prefab::SpriteScenePrefab},
-    },
+    assets::{ProgressCounter},
     ui::{UiTransform, UiText, UiImage, Interactable, Anchor, LineMode, UiEventType},
 };
 
@@ -17,6 +14,7 @@ use amethyst::{
 use log::*;
 use std::collections::HashMap;
 
+#[allow(dead_code)]
 pub struct MainMenu {
     my_entities: HashMap<String, Entity>,
     progress: ProgressCounter,
@@ -28,13 +26,10 @@ impl SimpleState for MainMenu {
         let StateData { world, .. } = data;
 
         { // BG
-            let bg_prefab = world.exec(|loader: PrefabLoader<'_, SpriteScenePrefab>| {
-                loader.load(
-                    "mainmenu/bg.ron",
-                    RonFormat,
-                    &mut self.progress,
-                )
-            });
+            let bg_prefab = {
+                let cache = world.fetch_mut::<SpriteScenePrefabCache>();
+                cache.get("mainmenu/bg")
+            };
 
             let mut transform = Transform::default();
             transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 0.0);

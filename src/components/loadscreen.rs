@@ -21,17 +21,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Eq, PartialOrd, PartialEq, Hash, Debug, Copy, Clone, Deserialize, Serialize)]
 pub enum AnimationId {
-    Splash,
+    Load,
 }
 
 #[derive(Debug, Clone, Deserialize, PrefabData)]
 #[serde(deny_unknown_fields)]
-pub struct SplashScreen {
+pub struct LoadScreen {
     sprite_scene: SpriteScenePrefab,
     animation_set: AnimationSetPrefab<AnimationId, SpriteRender>,
 }
 
-impl SplashScreen {
+impl LoadScreen {
     pub fn start_anim(world: &mut World, ent: Entity) {
         let animation_sets = world.read_component::<AnimationSet<AnimationId, SpriteRender>>();
         let mut control_sets = world.write_component::<AnimationControlSet<AnimationId, SpriteRender>>();
@@ -43,8 +43,8 @@ impl SplashScreen {
             let control_set = get_animation_set(&mut control_sets, entity).unwrap();
             // Adds the `Fly` animation to AnimationControlSet and loops infinitely
             control_set.add_animation(
-                AnimationId::Splash,
-                &animation_set.get(&AnimationId::Splash).unwrap(),
+                AnimationId::Load,
+                &animation_set.get(&AnimationId::Load).unwrap(),
                 EndControl::Loop(None),
                 1.0,
                 AnimationCommand::Start,

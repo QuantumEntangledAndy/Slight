@@ -1,8 +1,11 @@
 use amethyst::{
-    assets::{AssetStorage, Handle, Loader, ProgressCounter},
+    assets::{AssetStorage, Handle, Loader, ProgressCounter, PrefabLoader, RonFormat, Prefab},
     prelude::*,
     renderer::{ImageFormat, SpriteSheet, SpriteSheetFormat, Texture},
     ui::{FontAsset, TtfFormat},
+    renderer::{
+        sprite::{prefab::SpriteScenePrefab},
+    },
 };
 use std::collections::HashMap;
 
@@ -78,5 +81,26 @@ impl FontCache {
             self.map.insert(key.to_string(), font_handle.clone());
             font_handle
         }
+    }
+}
+
+
+pub struct SpriteScenePrefabCache {
+    map: HashMap<String, Handle<Prefab<SpriteScenePrefab>>>,
+}
+
+impl SpriteScenePrefabCache {
+    pub fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+        }
+    }
+    #[allow(dead_code)]
+    pub fn insert(&mut self, key: &str, value: Handle<Prefab<SpriteScenePrefab>>) {
+        self.map.insert(key.to_string(), value.clone());
+    }
+
+    pub fn get(&self, key: &str) -> Handle<Prefab<SpriteScenePrefab>> {
+        self.map.get(key).unwrap().clone()
     }
 }
